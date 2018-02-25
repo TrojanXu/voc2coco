@@ -16,7 +16,10 @@ PRE_DEFINE_CATEGORIES = {}
                          #  "cow": 10, "diningtable": 11, "dog": 12, "horse": 13,
                          #  "motorbike": 14, "person": 15, "pottedplant": 16,
                          #  "sheep": 17, "sofa": 18, "train": 19, "tvmonitor": 20}
+PRE_DEFINE_CATEGORIES = {"mass": 1, "calcification": 2}
 
+nx, ny = 700, 1024
+id_counter = 0
 
 def get(root, name):
     vars = root.findall(name)
@@ -34,7 +37,9 @@ def get_and_check(root, name, length):
     return vars
 
 
-def get_filename_as_int(filename):
+def get_filename_as_int(filename, counter=0):
+    if counter > 0:
+        return counter
     try:
         filename = os.path.splitext(filename)[0]
         return int(filename)
@@ -43,15 +48,18 @@ def get_filename_as_int(filename):
 
 
 def convert(xml_list, xml_dir, json_file):
+    global id_counter
     list_fp = open(xml_list, 'r')
     json_dict = {"images":[], "type": "instances", "annotations": [],
                  "categories": []}
     categories = PRE_DEFINE_CATEGORIES
     bnd_id = START_BOUNDING_BOX_ID
     for line in list_fp:
+        id_counter += 1
         line = line.strip()
         print("Processing %s"%(line))
-        xml_f = os.path.join(xml_dir, line)
+        # TODO need to join .resized.xx_xx.xml
+        xml_f = os.path.join(xml_dir, "{}.resized.{}_{}.xml".format(line, nx, ny))
         tree = ET.parse(xml_f)
         root = tree.getroot()
         path = get(root, 'path')
@@ -62,7 +70,7 @@ def convert(xml_list, xml_dir, json_file):
         else:
             raise NotImplementedError('%d paths found in %s'%(len(path), line))
         ## The filename must be a number
-        image_id = get_filename_as_int(filename)
+        image_id = get_filename_as_int(filename, id_counter)
         size = get_and_check(root, 'size', 1)
         width = int(get_and_check(size, 'width', 1).text)
         height = int(get_and_check(size, 'height', 1).text)
@@ -105,9 +113,14 @@ def convert(xml_list, xml_dir, json_file):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) <= 1:
-        print('3 auguments are need.')
-        print('Usage: %s XML_LIST.txt XML_DIR OUTPU_JSON.json'%(sys.argv[0]))
-        exit(1)
-
-    convert(sys.argv[1], sys.argv[2], sys.argv[3])
+    # if len(sys.argv) <= 1:
+    #     print('3 auguments are need.')
+    #     print('Usage: %s XML_LIST.txt XML_DIR OUTPU_JSON.json'%(sys.argv[0]))
+    #     exit(1)
+    #
+    # convert(sys.argv[1], sys.argv[2], sys.argv[3])
+    convert('/home/xth/data/cbis_ddsm/frcnn/ImageSets/Main/train.txt', '/home/xth/data/cbis_ddsm/frcnn/Annotations/', 'train.json')
+    convert('/home/xth/data/cbis_ddsm/frcnn/ImageSets/Main/val.txt', '/home/xth/data/cbis_ddsm/frcnn/Annotations/',
+            'val.json')
+    convert('/home/xth/data/cbis_ddsm/frcnn/ImageSets/Main/test.txt', '/home/xth/data/cbis_ddsm/frcnn/Annotations/',
+            'test.json')
