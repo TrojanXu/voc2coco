@@ -18,7 +18,7 @@ PRE_DEFINE_CATEGORIES = {}
                          #  "sheep": 17, "sofa": 18, "train": 19, "tvmonitor": 20}
 PRE_DEFINE_CATEGORIES = {"mass": 1, "calcification": 2}
 
-nx, ny = 700, 1024
+nx, ny = 0, 0
 id_counter = 0
 
 def get(root, name):
@@ -124,3 +124,9 @@ if __name__ == '__main__':
             'val.json')
     convert('/home/xth/data/cbis_ddsm/frcnn/ImageSets/Main/test.txt', '/home/xth/data/cbis_ddsm/frcnn/Annotations/',
             'test.json')
+
+    convert('/home/xth/data/cbis_ddsm/frcnn/ImageSets/Main/train_filtered.txt', '/home/xth/data/cbis_ddsm/frcnn/Annotations/', 'train_filtered.json')
+    convert('/home/xth/data/cbis_ddsm/frcnn/ImageSets/Main/val_filtered.txt', '/home/xth/data/cbis_ddsm/frcnn/Annotations/',
+            'val_filtered.json')
+    convert('/home/xth/data/cbis_ddsm/frcnn/ImageSets/Main/test_filtered.txt', '/home/xth/data/cbis_ddsm/frcnn/Annotations/',
+            'test_filtered.json')
